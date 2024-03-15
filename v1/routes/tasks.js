@@ -15,5 +15,8 @@ module.exports = (router) => {
     router.route('/add_comment')
         .post(verifyToken, controller.add_comment);
 
+    router.route('/change_status')
+        .post(verifyToken, controller.change_status);
+
     return router;
 }

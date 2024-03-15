@@ -94,7 +94,7 @@ module.exports = {
         const { error } = schema.validate(data);
           
         if (error) {
-            return requests.error_response(req, res, error, "Wrong data 1");
+            return requests.error_response(req, res, error, "Wrong data");
         }
       
         let comment = await task_functions.add_comment(data);
@@ -102,7 +102,36 @@ module.exports = {
         if (comment !== false) {
             return requests.success_response(req, res, comment, "success request");
         }else{
+            return requests.error_response(req, res, {}, "Wrong data");
+        }
+    },
+
+    change_status: async (req, res) => {
+
+        const user_data = req.decoded;
+
+        let data = {
+            id_task: req.body.id_task,
+            id_status: req.body.id_status
+        };
+
+        const schema = Joi.object({
+            id_task: Joi.string().min(1).required(),
+            id_status: Joi.string().min(1).required(),
+        });
+          
+        const { error } = schema.validate(data);
+          
+        if (error) {
+            return requests.error_response(req, res, error, "Wrong data 1");
+        }
+      
+        let updated_task = await task_functions.change_status(user_data, data.id_task, data.id_status);
+
+        if (updated_task !== false) {
+            return requests.success_response(req, res, updated_task, "success request");
+        }else{
             return requests.error_response(req, res, {}, "Wrong data 2");
         }
-    },    
+    },
 }

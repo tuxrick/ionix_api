@@ -7,7 +7,6 @@ const Comment = require('../../models/comment');
 
 Task.belongsTo(User, { foreignKey: 'id_user' });
 Task.belongsTo(Status, { foreignKey: 'id_status' });
-//Task.belongsTo(Comment, { foreignKey: 'id_task' });
 Task.hasMany(Comment, { foreignKey: 'id_task' });
 
 const user_functions = require('../user/functions');
@@ -125,8 +124,6 @@ let task_functions = {
         }
     },
 
-
-
     add_comment: async (data) => {
         try{
             let comment_data = {
@@ -149,6 +146,28 @@ let task_functions = {
             return false;
         }
     },
+
+    change_status: async (user_data, task_id, new_status_id) => {
+        try {
+            const task = await Task.findByPk(task_id);
+
+            if (!task) {
+                return false;
+            }
+
+            if (user_data.role === 'executioner' && task.id_user !== user_data.id) {
+                return false;
+            }
+
+            task.id_status = new_status_id;
+
+            await task.save();
+
+            return task;
+        } catch (err) {
+            return false;
+        }
+    }
 
 }
 module.exports = task_functions;
