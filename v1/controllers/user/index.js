@@ -25,9 +25,19 @@ module.exports = {
         };
         
         let user_data = await user_functions.log_user(user_info);
-    
+
         if (user_data !== false) {
-          return requests.success_response(req, res, {token: user_data.token}, "success request" );
+          return requests.success_response(req, res, 
+            {
+                token: user_data.token,
+                user: {
+                    id: user_data.id,
+                    email: user_data.email,
+                    name: user_data.name,
+                    last_name: user_data.last_name,
+                    role: user_data.role
+                }
+            }, "success request" );
         }else{
           return requests.error_response(req, res, {}, "Wrong email or password2" );
         };
@@ -35,7 +45,7 @@ module.exports = {
     },
 
     register_user: async (req, res) => {
-        const today = new Date();
+
         let user_data = {
           email: req.body.email,
           password: req.body.password,

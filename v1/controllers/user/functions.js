@@ -16,7 +16,7 @@ let user_functions = {
                 if (token === false) {
                     return false;
                 }else{
-                    return {token: token};
+                    return {token: token, ...user_data.dataValues};
                 }
             }else{
                 return false;
@@ -28,11 +28,8 @@ let user_functions = {
 
     generateTokenWithPassword: async (user, password) => {
 
-        console.log("user", user);
-
         let validate_pass = await bcrypt.compareSync(password, user.password);
         let token = ""; 
-
 
         if (validate_pass) {
             token = await jwt.sign(
@@ -65,10 +62,27 @@ let user_functions = {
         }
     },
 
+    findUserById: async (id) =>{
+        try{
+            let result = await User.findOne({
+                where: {
+                  id: id
+                }
+            }).then(user => {
+                if (!user) return false;
+                return user;
+            });
+
+            return result;
+            
+        }catch(err){
+            return false;
+        }
+    },    
+
     register_user: async (user_info) => {
         try{
             let user_data = await user_functions.findUserByEmail(user_info.email);
-            console.log("user_data: ", user_data);
             //User already exists
             if (user_data !== false) {
                 return false;
@@ -91,7 +105,24 @@ let user_functions = {
     list_users: async ()=>{
         try{
             let result = await User.findAll({
-                attributes: ['id', 'email', 'name', 'last_name']
+                attributes: ['id', 'email', 'name', 'last_name', 'role']
+              }).then(users => {
+                if (!users) return false;
+                return users.map(user => user.toJSON());
+              });
+
+            return result;
+
+        }catch(err){
+            return false;
+        }
+    },
+
+    list_users_by_role: async (role)=>{
+        try{
+            let result = await User.findAll({
+                attributes: ['id', 'email', 'name', 'last_name', 'role'],
+                where: { role: role }
               }).then(users => {
                 if (!users) return false;
                 return users.map(user => user.toJSON());
