@@ -48,11 +48,6 @@ module.exports = {
 
         const user_data = req.decoded;
 
-        //Validating role
-        if (user_data.role != "admin") {
-            return requests.error_response(req, res, {}, "You are not allowed to do this action");
-        }
-
         const tasks_list = await task_functions.list_tasks(user_data.id, user_data.role);
 
         if (tasks_list !== false) {

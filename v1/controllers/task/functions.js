@@ -42,7 +42,7 @@ let task_functions = {
         try {
             let tasks;
             
-            if (role === 'admin') {
+            if (role == 'admin') {
                 tasks = await Task.findAll({
                     include: [{
                         model: User,
@@ -55,7 +55,7 @@ let task_functions = {
                         separate: true
                     }]
                 });
-            } else if (role === 'executioner') {
+            } else if (role == 'executor') {
                 tasks = await Task.findAll({
                     where: { id_user },
                     include: [{
