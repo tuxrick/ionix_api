@@ -63,4 +63,15 @@ module.exports = {
             return requests.error_response(req, res, {}, "Wrong data");
         }
     },
+
+    list_status: async (req, res) => {
+
+        const status_list = await task_functions.list_status();
+
+        if (status_list !== false) {
+            return requests.success_response(req, res, status_list, "success request");
+        }else{
+            return requests.error_response(req, res, {}, "Wrong data");
+        }
+    },
 }

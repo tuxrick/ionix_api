@@ -9,5 +9,8 @@ module.exports = (router) => {
     router.route('/list_tasks')
         .get(verifyToken, controller.list_tasks);
 
+    router.route('/list_status')
+        .get(verifyToken, controller.list_status);
+
     return router;
 }

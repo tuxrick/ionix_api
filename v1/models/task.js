@@ -15,9 +15,9 @@ module.exports = db.sequelize.define(
       type: Sequelize.INTEGER,
       allowNull: false
     },
-    status: {
-      type: Sequelize.STRING,
-      defaultValue: "Assigned"
+    id_status: {
+      type: Sequelize.INTEGER,
+      defaultValue: 1
     },
     title: {
       type: Sequelize.STRING,
