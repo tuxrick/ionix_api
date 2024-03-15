@@ -3,9 +3,12 @@
 const Task = require('../../models/task');
 const User = require('../../models/user');
 const Status = require('../../models/status');
+const Comment = require('../../models/comment');
 
 Task.belongsTo(User, { foreignKey: 'id_user' });
 Task.belongsTo(Status, { foreignKey: 'id_status' });
+//Task.belongsTo(Comment, { foreignKey: 'id_task' });
+Task.hasMany(Comment, { foreignKey: 'id_task' });
 
 const user_functions = require('../user/functions');
 
@@ -48,6 +51,9 @@ let task_functions = {
                     },{
                         model: Status,
                         attributes: ['id', 'status']
+                    },{
+                        model: Comment,
+                        separate: true
                     }]
                 });
             } else if (role === 'executioner') {
@@ -56,6 +62,12 @@ let task_functions = {
                     include: [{
                         model: User,
                         attributes: ['id', 'email', 'name', 'last_name', 'role']
+                    },{
+                        model: Status,
+                        attributes: ['id', 'status']
+                    },{
+                        model: Comment,
+                        separate: true
                     }]
                 });
             } else {
@@ -67,9 +79,10 @@ let task_functions = {
                     id: task.id,
                     title: task.title,
                     description: task.description,
-                    due_date: task.due_date,
                     id_status: task.id_status,
                     id_user: task.id_user,
+                    due_date: task.due_date,
+                    created: task.created,
                     status:{
                         id: task.status.id,
                         status: task.status.status
@@ -80,7 +93,16 @@ let task_functions = {
                         name: task.user.name,
                         last_name: task.user.last_name,
                         role: task.user.role
-                    }
+                    },
+                    comments: task.comments.map(comment => {
+                        return {
+                            id: comment.id,
+                            id_user: comment.id_user,
+                            id_task: comment.id_task,
+                            comment: comment.comment,
+                            created: comment.created
+                        };
+                    })
                 };
             });
 
@@ -101,6 +123,32 @@ let task_functions = {
         }catch(err){
             return false;
         }
-    }
+    },
+
+
+
+    add_comment: async (data) => {
+        try{
+            let comment_data = {
+                id_user: data.id_user,
+                id_task: data.id_task,
+                comment: data.comment,
+            };
+            let user_data = await user_functions.findUserById(comment_data.id_user);
+            //User does not exist
+            if (user_data == false) {
+                return false;
+            }else{
+                let comment = await Comment.create(comment_data).then(saved_comment => {
+                    if (!saved_comment) return false;
+                    return saved_comment;
+                });
+                return comment;
+            }
+        }catch(err){
+            return false;
+        }
+    },
+
 }
 module.exports = task_functions;

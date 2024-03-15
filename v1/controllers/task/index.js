@@ -48,8 +48,6 @@ module.exports = {
 
         const user_data = req.decoded;
 
-        console.log(user_data);
-
         //Validating role
         if (user_data.role != "admin") {
             return requests.error_response(req, res, {}, "You are not allowed to do this action");
@@ -74,4 +72,37 @@ module.exports = {
             return requests.error_response(req, res, {}, "Wrong data");
         }
     },
+
+    add_comment: async (req, res) => {
+
+        const user_data = req.decoded;
+
+        let data = {
+            id_user: user_data.id,
+            id_task: req.body.id_task,
+            comment: req.body.comment,
+        };
+
+        console.log(data);
+
+        const schema = Joi.object({
+            id_user: Joi.number().min(1).required(),
+            id_task: Joi.string().min(1).max(255).required(),
+            comment: Joi.string()
+        });
+          
+        const { error } = schema.validate(data);
+          
+        if (error) {
+            return requests.error_response(req, res, error, "Wrong data 1");
+        }
+      
+        let comment = await task_functions.add_comment(data);
+
+        if (comment !== false) {
+            return requests.success_response(req, res, comment, "success request");
+        }else{
+            return requests.error_response(req, res, {}, "Wrong data 2");
+        }
+    },    
 }
